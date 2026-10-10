@@ -399,6 +399,7 @@ textarea { min-height: 7.5rem; resize: vertical; line-height: 1.5; }
   .panel, .question { padding: 1.25rem; }
   .scale-key label { height: 3rem; }
   .question legend, .question .q-label { font-size: 1.125rem; }
+  .foot { text-align: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
