@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codebase onboarding survey · OSS-AGENT01 research</title>
+  <meta name="description" content="A 5-minute study on how developers and students get started with open-source codebases.">
+  <link rel="preload" href="fonts/ahn-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the survey</a>
+
+  <header class="masthead">
+    <div class="wrap">
+      <p class="brand"><span class="brand-mark" aria-hidden="true"></span>OSS-AGENT01 research · Open University of Sri Lanka</p>
+      <h1>How do you get started with an unfamiliar codebase?</h1>
+      <p class="lede">A short study on the hard parts of exploring and contributing to open-source projects. It takes about 5 minutes.</p>
+      <ol class="stepper" id="stepper" aria-label="Survey progress" hidden></ol>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <noscript>
+      <p class="panel">This survey needs JavaScript to save your answers. Please enable it and reload the page.</p>
+    </noscript>
+
+    <!-- Consent and introduction -->
+    <section class="panel" id="intro" aria-labelledby="intro-title">
+      <h2 id="intro-title">Before you start</h2>
+      <p>We are a final-year project team building OSS-AGENT01, a browser tool that helps newcomers understand open-source codebases. Your answers will shape what we build and how we evaluate it.</p>
+      <dl class="facts">
+        <div><dt>Time</dt><dd>About 5 minutes, 17 questions in 4 short parts.</dd></div>
+        <div><dt>Privacy</dt><dd>Anonymous. We don't ask for your name or email, and we don't track you.</dd></div>
+        <div><dt>Your choice</dt><dd>Taking part is voluntary. You can stop at any time; nothing is saved until you submit.</dd></div>
+        <div><dt>Use of data</dt><dd>Answers are stored securely and used only for this research, reported in summary form.</dd></div>
+      </dl>
+      <div class="consent">
+        <input type="checkbox" id="consent" class="box">
+        <label for="consent">I am 18 or older, I have read the information above, and I agree to take part.</label>
+      </div>
+      <p class="field-error" id="consent-error" hidden><span class="err-icon" aria-hidden="true">!</span>Tick the box to agree before you start.</p>
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="start">Start the survey</button>
+      </div>
+    </section>
+
+    <!-- Survey form: sections are rendered by app.js -->
+    <form id="survey" novalidate hidden>
+      <div class="error-summary" id="error-summary" tabindex="-1" hidden></div>
+      <div id="sections"></div>
+      <!-- Honeypot: hidden from people, filled in only by bots -->
+      <div class="hp" aria-hidden="true">
+        <label for="website">Leave this empty</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+      <p class="submit-error" id="submit-error" role="alert" hidden></p>
+      <div class="actions">
+        <button type="button" class="btn btn-quiet" id="back">Back</button>
+        <button type="button" class="btn btn-primary" id="next">Next</button>
+      </div>
+    </form>
+
+    <!-- Thank-you -->
+    <section class="panel thanks" id="thanks" tabindex="-1" aria-labelledby="thanks-title" hidden>
+      <span class="thanks-mark" aria-hidden="true"></span>
+      <h2 id="thanks-title">Answers submitted</h2>
+      <p>Thank you for taking part. Your experience helps us design a tool that makes open source easier to join.</p>
+      <p class="muted">You can close this page now.</p>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>OSS-AGENT01 final-year project · EER6689 · Open University of Sri Lanka</p>
+  </footer>
+</body>
+</html>
