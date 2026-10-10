@@ -44,7 +44,7 @@
 
   --radius-panel: 16px;
   --radius-control: 10px;
-  --measure: 50rem;
+  --measure: 62rem;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -118,10 +118,9 @@ p { margin: 0 0 1rem; }
   font-size: var(--step-3);
   font-weight: 700;
   letter-spacing: -0.01em;
-  max-width: 18ch;
   margin-bottom: .75rem;
 }
-.lede { color: var(--muted); max-width: 34rem; margin: 0; }
+.lede { color: var(--muted); max-width: 48rem; margin: 0; }
 
 /* ---------- Stepper (a real 4-part sequence) ---------- */
 .stepper {
@@ -474,14 +473,9 @@ textarea { min-height: 7.5rem; resize: vertical; line-height: 1.5; }
   .question legend, .question .q-label { font-size: 1.125rem; }
   .foot, .foot p { text-align: center; }
 
-  /* Full-width start button on mobile */
+  /* Full-width start button on mobile only */
   #intro .actions { width: 100%; }
   #start { width: 100%; margin: 0; text-align: center; }
-
-  /* Form actions on mobile */
-  form .actions { flex-direction: column-reverse; align-items: stretch; gap: .75rem; }
-  form .actions .btn { width: 100%; margin-left: 0; }
-  .notice-actions .btn { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
