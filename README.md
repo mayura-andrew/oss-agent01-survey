@@ -52,6 +52,14 @@ docker run -p 8080:8080 --env-file .env oss-survey
 
 Behind a host's proxy or load balancer (Render, Fly, Nginx), set `TRUST_PROXY=true` so the per-person submission limit sees real visitor addresses. Serve the site over HTTPS; most hosts do this for you.
 
+### Hosting the page on GitHub Pages
+
+The page can also be served from GitHub Pages while the Go server runs elsewhere. [.github/workflows/pages.yml](.github/workflows/pages.yml) publishes `web/` on every push to `main` that touches it.
+
+1. Set the repository variable `API_URL` to the full submit endpoint, e.g. `https://your-api.example.com/api/responses`.
+2. On the API server, set `ALLOWED_ORIGIN=https://<user>.github.io` (scheme and host only, no path).
+3. In **Settings → Pages**, set **Source** to **GitHub Actions**.
+
 ## Settings
 
 | Variable | Required | Default | Meaning |

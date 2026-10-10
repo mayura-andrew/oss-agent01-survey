@@ -141,7 +141,8 @@ const SECTIONS = [
 const TEXT_MAX = 2000;
 const OTHER_MAX = 200;
 const DRAFT_KEY = "oss-agent01-survey-draft-v1";
-const API_URL = "/api/responses";
+// Overridden at build time when the page is hosted apart from the API (GitHub Pages).
+const API_URL = document.querySelector('meta[name="api-url"]')?.content || "/api/responses";
 
 /* ---------- State ---------- */
 let answers = {};
