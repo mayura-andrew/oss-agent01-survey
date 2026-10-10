@@ -24,6 +24,7 @@ func valid() Submission {
 		FeatureAIAssistant:       3,
 		FeaturePrivacy:           3,
 		LikelihoodToUse:          3,
+		BiggestFrustration:       "Finding the entry point",
 		CompletionSeconds:        120,
 	}
 }
@@ -84,6 +85,9 @@ func TestValidate(t *testing.T) {
 		{"diagram missing", func(s *Submission) { s.DiagramFrequency = "" }, "diagram_frequency", "choose one answer"},
 		{"diagram unknown", func(s *Submission) { s.DiagramFrequency = "sometimes" }, "diagram_frequency", "choose one answer"},
 
+		{"frustration missing", func(s *Submission) { s.BiggestFrustration = "" }, "biggest_frustration", "answer this question"},
+		{"frustration only spaces", func(s *Submission) { s.BiggestFrustration = " \n\t " }, "biggest_frustration", "answer this question"},
+		{"overcome blank is fine", func(s *Submission) { s.HowOvercome = "  " }, "", ""},
 		{"frustration at limit", func(s *Submission) { s.BiggestFrustration = sinhala(MaxOpenText) }, "", ""},
 		{"frustration too long", func(s *Submission) { s.BiggestFrustration = sinhala(MaxOpenText + 1) }, "biggest_frustration", "must be 2000 characters or fewer"},
 		{"overcome at limit", func(s *Submission) { s.HowOvercome = sinhala(MaxOpenText) }, "", ""},
@@ -138,7 +142,7 @@ func TestValidate(t *testing.T) {
 func TestValidateReportsEveryField(t *testing.T) {
 	var s Submission
 	errs := s.Validate()
-	for _, f := range []string{"consent", "roles", "oss_experience", "barriers", "likert_structure", "time_to_confidence", "exploration_methods", "diagram_frequency", "likelihood_to_use"} {
+	for _, f := range []string{"consent", "roles", "oss_experience", "barriers", "likert_structure", "time_to_confidence", "exploration_methods", "diagram_frequency", "likelihood_to_use", "biggest_frustration"} {
 		if errs[f] == "" {
 			t.Errorf("no error for %s", f)
 		}
@@ -174,8 +178,11 @@ func TestToRow(t *testing.T) {
 	t.Run("blank optional text is null", func(t *testing.T) {
 		s := valid()
 		r := s.ToRow()
-		if r.RoleOther != nil || r.BiggestFrustration != nil || r.HowOvercome != nil {
-			t.Fatalf("want nil optional fields, got %v %v %v", r.RoleOther, r.BiggestFrustration, r.HowOvercome)
+		if r.RoleOther != nil || r.HowOvercome != nil {
+			t.Fatalf("want nil optional fields, got %v %v", r.RoleOther, r.HowOvercome)
+		}
+		if r.BiggestFrustration == nil || *r.BiggestFrustration != "Finding the entry point" {
+			t.Fatalf("required Q16 text lost: %v", r.BiggestFrustration)
 		}
 		if !r.Consent || r.SurveyVersion != Version || r.CompletionSeconds != 120 {
 			t.Fatalf("unexpected row %+v", r)

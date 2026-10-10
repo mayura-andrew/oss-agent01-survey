@@ -130,7 +130,7 @@ const SECTIONS = [
           ["5", "Definitely would use"],
         ],
       },
-      { n: 16, key: "biggest_frustration", type: "text", optional: true,
+      { n: 16, key: "biggest_frustration", type: "text",
         label: "What is the single biggest frustration you face when opening an open-source repository for the first time?" },
       { n: 17, key: "how_overcome", type: "text", optional: true,
         label: "If you face challenges, how do you overcome them? What tools or methods do you use?" },
@@ -278,7 +278,7 @@ function renderText(q) {
   ta.value = answers[q.key] || "";
   const count = el("p", { class: "counter", id: `count-${q.key}` });
   const update = () => { count.textContent = `${ta.value.length} / ${TEXT_MAX} characters`; };
-  ta.addEventListener("input", () => { answers[q.key] = ta.value; update(); saveDraft(); });
+  ta.addEventListener("input", () => { answers[q.key] = ta.value; update(); clearFieldError(q.key); saveDraft(); });
   update();
   wrap.append(ta, count);
   return wrap;
@@ -374,6 +374,8 @@ function validateSection(index) {
       else if (q.otherKey && v.includes("other") && !(answers[q.otherKey] || "").trim()) msg = "Describe your other role, or unselect Other.";
     } else if (q.type === "scale" || q.type === "single") {
       if (v == null || v === "") msg = q.type === "scale" ? "Choose a number from 1 to 5." : "Choose one answer.";
+    } else if (q.type === "text") {
+      if (!(v || "").trim()) msg = "Write a short answer.";
     }
     if (msg) errors.push({ q, msg });
   }
