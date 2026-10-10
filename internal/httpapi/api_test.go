@@ -103,6 +103,7 @@ func TestStatusCodes(t *testing.T) {
 		{"415 not JSON", "POST", "text/plain", validBody, nil, 100, 415, 0, "send JSON"},
 		{"415 no content type", "POST", "", validBody, nil, 100, 415, 0, "send JSON"},
 		{"422 invalid answers", "POST", ctJSON, `{"consent":false}`, nil, 100, 422, 0, "invalid answers"},
+		{"422 Q16 left blank", "POST", ctJSON, strings.Replace(validBody, `"biggest_frustration":"Setup"`, `"biggest_frustration":"  "`, 1), nil, 100, 422, 0, "invalid answers"},
 		{"429 rate limited", "POST", ctJSON, validBody, nil, 0, 429, 0, "too many submissions, try again later"},
 		{"502 storage failure", "POST", ctJSON, validBody, errors.New("boom"), 100, 502, 1, "could not save answers"},
 	}

@@ -138,6 +138,9 @@ func (s *Submission) Validate() map[string]string {
 	}
 	s.BiggestFrustration = strings.TrimSpace(s.BiggestFrustration)
 	s.HowOvercome = strings.TrimSpace(s.HowOvercome)
+	if s.BiggestFrustration == "" {
+		errs["biggest_frustration"] = "answer this question"
+	}
 	if utf8.RuneCountInString(s.BiggestFrustration) > MaxOpenText {
 		errs["biggest_frustration"] = fmt.Sprintf("must be %d characters or fewer", MaxOpenText)
 	}
