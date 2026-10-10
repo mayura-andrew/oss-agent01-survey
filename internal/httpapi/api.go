@@ -64,6 +64,13 @@ func New(log *slog.Logger, saver ResponseSaver, limiter Limiter, site fs.FS, opt
 	mux.Handle("POST /api/responses", a.cors(a.requireJSON(a.rateLimit(http.HandlerFunc(a.submit)))))
 	if opts.AllowedOrigin != "" {
 		mux.Handle("OPTIONS /api/responses", a.cors(http.HandlerFunc(preflight)))
+		mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, _ *http.Request) {
+			a.writeJSON(w, http.StatusOK, map[string]string{
+				"status":   "ok",
+				"service":  "OSS-AGENT01 Survey API",
+				"frontend": opts.AllowedOrigin + "/oss-agent01-survey/",
+			})
+		})
 	}
 	mux.Handle("/api/responses", a.cors(http.HandlerFunc(a.methodNotAllowed)))
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {

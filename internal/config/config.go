@@ -50,7 +50,7 @@ func Load(getenv func(string) string) (Config, error) {
 		SupabaseURL:   strings.TrimRight(getenv("SUPABASE_URL"), "/"),
 		SupabaseKey:   getenv("SUPABASE_SECRET_KEY"),
 		Table:         envOr(getenv, "SUPABASE_TABLE", DefaultTable),
-		AllowedOrigin: getenv("ALLOWED_ORIGIN"),
+		AllowedOrigin: strings.TrimRight(getenv("ALLOWED_ORIGIN"), "/"),
 		TrustProxy:    getenv("TRUST_PROXY") == "true",
 		RateLimit:     DefaultRateLimit,
 		RateWindow:    DefaultRateWindow,

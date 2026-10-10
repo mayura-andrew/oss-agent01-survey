@@ -1,2 +1,5 @@
 .env
 /survey
+DEPLOYMENT.md
+UNINSTALL.md
+/deploy.sh
