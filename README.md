@@ -140,7 +140,7 @@ Review these with your supervisor before launch:
 1. **Renumbered Q1–Q17.** The original had two questions numbered Q3.
 2. **Added "Not applicable: I already contribute" to Q3.** Without it, experienced contributors had no honest answer. Choosing it clears the other reasons, and choosing a reason clears it.
 3. **Q3 and Q1 are "select all that apply"**, and Q9 enforces "up to 3".
-4. **Q16 and Q17 (open text) are optional**, to lower the effort of finishing.
+4. **Q16 (open text) is required; Q17 is optional**, to keep the effort of finishing low.
 5. **Added a consent step** (18 or older, voluntary, anonymous), which ethics review normally expects for research with people.
 
 Two things worth considering:
