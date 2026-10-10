@@ -44,7 +44,7 @@
 
   --radius-panel: 16px;
   --radius-control: 10px;
-  --measure: 40rem;
+  --measure: 62rem;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -118,10 +118,9 @@ p { margin: 0 0 1rem; }
   font-size: var(--step-3);
   font-weight: 700;
   letter-spacing: -0.01em;
-  max-width: 18ch;
   margin-bottom: .75rem;
 }
-.lede { color: var(--muted); max-width: 34rem; margin: 0; }
+.lede { color: var(--muted); max-width: 48rem; margin: 0; }
 
 /* ---------- Stepper (a real 4-part sequence) ---------- */
 .stepper {
@@ -459,8 +458,9 @@ textarea { min-height: 7.5rem; resize: vertical; line-height: 1.5; }
 .option:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
 .option input:focus-visible { outline: none; }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
   .masthead { padding-top: 2rem; }
+  .brand { justify-content: center; text-align: center; }
   .panel, .question { padding: 1.25rem; }
   .hero-art {
     margin: -1.25rem -1.25rem 1.25rem;
@@ -471,14 +471,11 @@ textarea { min-height: 7.5rem; resize: vertical; line-height: 1.5; }
   }
   .scale-key label { height: 3rem; }
   .question legend, .question .q-label { font-size: 1.125rem; }
-  .foot { text-align: center; }
-}
+  .foot, .foot p { text-align: center; }
 
-@media (max-width: 399px) {
-  /* Back / Next: full width, Next on top; DOM order stays Back, Next. */
-  form .actions { flex-direction: column-reverse; align-items: stretch; gap: .75rem; }
-  form .actions .btn { width: 100%; margin-left: 0; }
-  .notice-actions .btn { width: 100%; }
+  /* Full-width start button on mobile only */
+  #intro .actions { width: 100%; }
+  #start { width: 100%; margin: 0; text-align: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
