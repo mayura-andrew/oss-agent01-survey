@@ -13,10 +13,17 @@ The browser never talks to Supabase directly, so the Supabase secret key is neve
 
 | Path | What it is |
 | --- | --- |
-| `main.go` | The Go service: serves the page, validates answers, limits repeat submissions, saves to Supabase. Standard library only, no dependencies. |
+| `cmd/survey/` | The program's entry point: reads settings, wires the parts together, and shuts down gracefully. Standard library only, no dependencies. |
+| `internal/survey/` | The questions' allowed answers, validation rules, and the row that gets stored. |
+| `internal/httpapi/` | HTTP routes, the submit handler, and middleware (security headers, CORS, rate limiting, request logging). |
+| `internal/store/` | The Supabase REST client. |
+| `internal/ratelimit/` | The per-visitor submission limiter. |
+| `internal/config/` | Reads and checks the environment settings. |
+| `embed.go` | Builds `web/` into the binary. |
 | `web/` | The survey page: `index.html`, `styles.css`, `app.js`, a self-hosted font, and the favicon. Built into the Go binary. |
 | `supabase/schema.sql` | Creates the `survey_responses` table, one column per question, with checks and row-level security. |
 | `Dockerfile` | Builds a small, non-root container. |
+| `Makefile`, `.golangci.yml` | `make run`, `build`, `test`, `vet`, `fmt`, `lint`. |
 | `.env.example` | The settings you need to fill in. |
 
 ## 1. Set up Supabase (about 5 minutes)
@@ -36,8 +43,10 @@ You need Go 1.22 or newer.
 ```bash
 cp .env.example .env          # then fill in the two Supabase values
 set -a; source .env; set +a   # load the settings
-go run .
+go run ./cmd/survey           # or: make run
 ```
+
+Run the tests with `make test` (`go test -race -cover ./...`) and the linters with `make lint` ([golangci-lint](https://golangci-lint.run) v2).
 
 Open <http://localhost:8080>, complete the survey, then check **Table Editor → survey_responses** in Supabase to see the row.
 
@@ -71,6 +80,7 @@ The page can also be served from GitHub Pages while the Go server runs elsewhere
 | `RATE_LIMIT` | No | `5` | Submissions per IP address per 10 minutes |
 | `TRUST_PROXY` | No | `false` | Read visitor IP from `X-Forwarded-For` |
 | `ALLOWED_ORIGIN` | No | – | Only if you host the page on a different domain from the API |
+| `LOG_FORMAT` | No | `text` | `text` or `json` |
 
 ## How the data is protected
 
@@ -138,4 +148,4 @@ Two things worth considering:
 - **Q10 has no middle option.** Always / Frequently / Rarely / Never skips "Sometimes", which pushes undecided people toward Frequently or Rarely.
 - **Q7 is positively worded** ("comfortable"), while Q4–Q6 describe difficulty. Reverse-code Q7 when combining them (the analysis query above does this).
 
-To change wording or options, edit the `SECTIONS` list in `web/app.js`. If you add or rename an option, also update the matching list in `main.go` and the check in `supabase/schema.sql`, and bump `surveyVersion` in `main.go`.
+To change wording or options, edit the `SECTIONS` list in `web/app.js`. If you add or rename an option, also update the matching list in `internal/survey/survey.go` and the check in `supabase/schema.sql`, and bump `Version` in `internal/survey/survey.go`.

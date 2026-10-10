@@ -2,7 +2,7 @@
 
 /*
   Survey definition. The keys and option values here must match the Go API
-  (main.go) and the database (supabase/schema.sql).
+  (internal/survey) and the database (supabase/schema.sql).
 */
 const AGREE = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"];
 const VALUE = ["Not valuable", "Slightly valuable", "Moderately valuable", "Very valuable", "Extremely valuable"];
@@ -164,6 +164,9 @@ function saveDraft() {
 function clearDraft() {
   try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
 }
+function hasSavedAnswers() {
+  return Object.values(answers).some((v) => (Array.isArray(v) ? v.length > 0 : v != null && v !== ""));
+}
 
 /* ---------- DOM helpers ---------- */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -281,12 +284,23 @@ function renderText(q) {
   return wrap;
 }
 
+// "Part 2 of 4 · Questions 4–8 of 17", derived from SECTIONS.
+function progressText(index) {
+  const total = SECTIONS.reduce((n, s) => n + s.questions.length, 0);
+  const qs = SECTIONS[index].questions;
+  const first = qs[0].n;
+  const last = qs[qs.length - 1].n;
+  const range = first === last ? `Question ${first}` : `Questions ${first}–${last}`;
+  return `Part ${index + 1} of ${SECTIONS.length} · ${range} of ${total}`;
+}
+
 function renderSection(index) {
   const s = SECTIONS[index];
   const box = $("#sections");
   box.replaceChildren();
   const head = el("div", { class: "section-head" },
-    el("h2", { id: "section-title", tabindex: "-1", text: s.title }),
+    el("h2", { id: "section-title", tabindex: "-1", "aria-describedby": "section-progress", text: s.title }),
+    el("p", { class: "section-progress", id: "section-progress", text: progressText(index) }),
     el("p", { text: s.intro }));
   box.append(head);
   s.questions.forEach((q) => {
@@ -509,7 +523,7 @@ function onBack() {
   }
 }
 
-function start() {
+function start(index = 0) {
   const box = $("#consent");
   const e = $("#consent-error");
   if (!box.checked) {
@@ -523,15 +537,75 @@ function start() {
   box.removeAttribute("aria-invalid");
   if (!startedAt) startedAt = Date.now();
   saveDraft();
+  $(".hero-art").classList.add("played"); // the drawing animates once, on first load only
   $("#intro").hidden = true;
   $("#survey").hidden = false;
-  goTo(0);
+  goTo(index);
+}
+
+/* ---------- Returning participants ---------- */
+function firstIncompleteSection() {
+  const i = SECTIONS.findIndex((_, idx) => validateSection(idx).length > 0);
+  return i === -1 ? SECTIONS.length - 1 : i;
+}
+
+function setupResume() {
+  if (!hasSavedAnswers()) return;
+  $("#resume").hidden = false;
+  $("#resume-continue").addEventListener("click", () => start(firstIncompleteSection()));
+  $("#resume-reset").addEventListener("click", () => {
+    $("#resume-ask").hidden = true;
+    $("#resume-confirm").hidden = false;
+    $("#resume-confirm-text").focus();
+  });
+  $("#resume-keep").addEventListener("click", () => {
+    $("#resume-confirm").hidden = true;
+    $("#resume-ask").hidden = false;
+    $("#resume-reset").focus();
+  });
+  $("#resume-clear").addEventListener("click", () => {
+    clearDraft();
+    answers = {};
+    startedAt = null;
+    $("#resume-confirm").hidden = true;
+    const done = $("#resume-done");
+    done.hidden = false;
+    done.focus();
+  });
+}
+
+/* ---------- Sharing (thank-you screen) ---------- */
+let shareTimer = null;
+async function share() {
+  const status = $("#share-status");
+  const url = location.origin + location.pathname; // no query or hash: nothing to track
+  const show = (msg, briefly) => {
+    status.textContent = msg;
+    clearTimeout(shareTimer);
+    if (briefly) shareTimer = setTimeout(() => { status.textContent = ""; }, 3000);
+  };
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: document.title, text: "Lost in a huge codebase? Take the 5-minute OSS-AGENT01 survey.", url });
+      return;
+    } catch (e) {
+      if (e && e.name === "AbortError") return; // the share sheet was closed
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    show("Link copied", true);
+  } catch (_) {
+    show(`Copy this link: ${url}`, false); // stays until copied by hand
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   loadDraft();
   $("#intro-title").setAttribute("tabindex", "-1");
-  $("#start").addEventListener("click", start);
+  $("#start").addEventListener("click", () => start(0));
+  $("#share").addEventListener("click", share);
+  setupResume();
   $("#next").addEventListener("click", onNext);
   $("#back").addEventListener("click", onBack);
   $("#consent").addEventListener("change", (ev) => {

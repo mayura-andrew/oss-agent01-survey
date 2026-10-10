@@ -1,0 +1,40 @@
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - bodyclose
+    - errcheck
+    - gosec
+    - govet
+    - ineffassign
+    - revive
+    - staticcheck
+    - unused
+  settings:
+    revive:
+      rules:
+        - name: exported
+        - name: package-comments
+        - name: var-naming
+        - name: indent-error-flow
+        - name: errorf
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: receiver-naming
+        - name: unexported-return
+        - name: blank-imports
+        - name: dot-imports
+        - name: increment-decrement
+        - name: range
+        - name: superfluous-else
+        - name: unreachable-code
+        - name: redefines-builtin-id
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

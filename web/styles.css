@@ -65,7 +65,7 @@ body {
   width: 100%;
   max-width: calc(var(--measure) + 3rem);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 max(1.5rem, env(safe-area-inset-right)) 0 max(1.5rem, env(safe-area-inset-left));
 }
 
 h1, h2, h3 { line-height: 1.2; margin: 0; }
@@ -145,9 +145,13 @@ p { margin: 0 0 1rem; }
 .stepper .name { display: inline; }
 
 @media (max-width: 560px) {
+  .stepper { display: flex; gap: .4rem; }
+  .stepper li { flex: none; min-width: 2.25rem; }
+  /* the current part takes the free space; a long name wraps beside its number, not under it */
+  .stepper li[aria-current="step"] { flex: 1; min-width: 0; display: flex; }
+  .stepper li[aria-current="step"] .num { flex: none; }
   .stepper .name { display: none; }
   .stepper li[aria-current="step"] .name { display: inline; }
-  .stepper { grid-template-columns: auto auto auto auto; }
 }
 
 /* ---------- Panels and sections ---------- */
@@ -160,13 +164,65 @@ p { margin: 0 0 1rem; }
 }
 .panel h2, .section-head h2 { font-size: var(--step-2); margin-bottom: .75rem; }
 
+/* ---------- Consent-step illustration (same art as the flyer) ---------- */
+.hero-art {
+  margin: -2rem -2rem 1.75rem;
+  aspect-ratio: 794 / 470; /* reserves the space: no layout shift */
+  overflow: hidden;
+  border-radius: calc(var(--radius-panel) - 1px) calc(var(--radius-panel) - 1px) 0 0;
+  background: var(--ink); /* the art's own backdrop, shown while it paints */
+}
+.hero-art svg { display: block; width: 100%; height: 100%; }
+.hero-art text { font-family: var(--font); }
+
+/* The one motion moment: draw the path from the issue to the right file. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-art .route {
+    stroke-dasharray: 1;
+    animation: route-draw 1.6s ease-out .3s both;
+  }
+  .hero-art .route-dot { animation: fade-in .2s ease-out both; }
+  .hero-art .route-dot-1 { animation-delay: .53s; }
+  .hero-art .route-dot-2 { animation-delay: .8s; }
+  .hero-art .route-dot-3 { animation-delay: 1.07s; }
+  .hero-art .route-dot-4 { animation-delay: 1.45s; }
+  .hero-art .target { animation: fade-in .45s ease-out 1.9s both; }
+  .hero-art.played * { animation: none; }
+}
+@keyframes route-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.notice {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  background: var(--accent-tint);
+  border-radius: var(--radius-control);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.notice p { margin: 0; font-weight: 700; }
+.notice-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .9rem; }
+.notice-actions .btn-primary { margin-left: 0; }
+
 .facts { margin: 1.5rem 0; display: grid; gap: .9rem; }
 .facts div { display: grid; grid-template-columns: 7.5rem 1fr; gap: 1rem; }
 .facts dt { font-weight: 700; }
 .facts dd { margin: 0; color: var(--muted); }
-@media (max-width: 560px) { .facts div { grid-template-columns: 1fr; gap: .1rem; } }
+@media (max-width: 560px) {
+  /* label and text share a line, so the consent box is reached sooner */
+  .facts { gap: .6rem; margin: 1.25rem 0; }
+  .facts div { display: block; }
+  .facts dt, .facts dd { display: inline; }
+  .facts dt { margin-right: .4rem; }
+}
 
 .section-head { margin: .5rem 0 1.25rem; }
+.section-head .section-progress {
+  color: var(--accent);
+  font-size: var(--step--1);
+  font-weight: 700;
+  margin: -.35rem 0 .5rem;
+}
 .section-head p { color: var(--muted); margin: 0; }
 
 .question {
@@ -197,6 +253,7 @@ p { margin: 0 0 1rem; }
 .options { display: grid; gap: .5rem; clear: both; }
 
 .option {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: .75rem;
@@ -210,6 +267,7 @@ p { margin: 0 0 1rem; }
 .option:has(input:checked) { border-color: var(--accent); background: var(--accent-tint); }
 .option:has(input:disabled) { opacity: .55; cursor: not-allowed; }
 .option label { cursor: inherit; flex: 1; }
+.option label::before { content: ""; position: absolute; inset: 0; } /* stretch the hit area to the row */
 
 /* custom radio / checkbox, 3:1 border contrast */
 .box, .dot {
@@ -337,7 +395,7 @@ textarea { min-height: 7.5rem; resize: vertical; line-height: 1.5; }
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin: 1.5rem 0 3rem;
+  margin: 1.5rem 0 calc(3rem + env(safe-area-inset-bottom));
 }
 .panel .actions { margin-bottom: 0; justify-content: flex-start; }
 .btn {
@@ -354,9 +412,13 @@ textarea { min-height: 7.5rem; resize: vertical; line-height: 1.5; }
 .btn-primary[aria-busy="true"] { opacity: .8; cursor: progress; }
 .btn-quiet { background: transparent; color: var(--ink); border-color: var(--control); }
 .btn-quiet:hover { border-color: var(--ink); }
+.btn-danger { background: var(--error); color: #fff; }
+.btn-danger:hover { background: #8F1E18; }
 
-.consent { display: flex; gap: .75rem; align-items: flex-start; margin-top: 1.5rem; }
+.consent { position: relative; display: flex; gap: .75rem; align-items: flex-start; margin-top: 1.5rem; padding: .5rem 0; }
 .consent label { font-weight: 700; cursor: pointer; }
+.consent label::before { content: ""; position: absolute; inset: 0; } /* the whole row toggles */
+.option input, .consent input { position: relative; z-index: 1; } /* the control itself stays clickable above the stretched label */
 
 /* ---------- Thank-you ---------- */
 .thanks { text-align: left; }
@@ -379,6 +441,9 @@ textarea { min-height: 7.5rem; resize: vertical; line-height: 1.5; }
   transform: translateY(-2px) rotate(45deg);
 }
 .muted { color: var(--muted); }
+.share { border-top: 1px solid var(--line); margin-top: 1.5rem; padding-top: 1.5rem; }
+.share h3 { font-size: var(--step-1); margin-bottom: .9rem; }
+.share-status { font-size: var(--step--1); color: var(--success); font-weight: 700; margin: .75rem 0 0; min-height: 1.4em; overflow-wrap: anywhere; }
 
 /* ---------- Misc ---------- */
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
@@ -386,7 +451,7 @@ textarea { min-height: 7.5rem; resize: vertical; line-height: 1.5; }
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
-.foot { color: var(--muted); font-size: var(--step--1); padding-bottom: 2.5rem; }
+.foot { color: var(--muted); font-size: var(--step--1); padding-bottom: calc(2.5rem + env(safe-area-inset-bottom)); }
 
 /* Visible keyboard focus everywhere */
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
@@ -397,11 +462,25 @@ textarea { min-height: 7.5rem; resize: vertical; line-height: 1.5; }
 @media (max-width: 560px) {
   .masthead { padding-top: 2rem; }
   .panel, .question { padding: 1.25rem; }
+  .hero-art {
+    margin: -1.25rem -1.25rem 1.25rem;
+    /* Crop from the right, keeping the issue tag, the three students and
+       their speech bubble (the left 520 of 794 units) whole. */
+    aspect-ratio: 520 / 470;
+    max-height: 38vh;
+  }
   .scale-key label { height: 3rem; }
   .question legend, .question .q-label { font-size: 1.125rem; }
   .foot { text-align: center; }
 }
 
+@media (max-width: 399px) {
+  /* Back / Next: full width, Next on top; DOM order stays Back, Next. */
+  form .actions { flex-direction: column-reverse; align-items: stretch; gap: .75rem; }
+  form .actions .btn { width: 100%; margin-left: 0; }
+  .notice-actions .btn { width: 100%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; scroll-behavior: auto !important; }
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
